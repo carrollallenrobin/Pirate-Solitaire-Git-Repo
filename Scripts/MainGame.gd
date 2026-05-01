@@ -31,6 +31,7 @@ var _current_deck : Array [Card]
 
 @onready var _tuto_window = preload("res://00_Scènes/Tutorial.tscn")
 @onready var _victory_screen = preload("res://00_Scènes/VictoryScreen.tscn")
+const _overflow_font := preload("res://Fonts/dogica.ttf")
 var _victory_screen_instance
 
 # used by coroutines (await) to determine if a new game has been launched while it ran
@@ -48,7 +49,7 @@ func _ready():
 	CardManager._beasts_button_group = _fregate_button.button_group
 	CardManager._beasts_button_group.pressed.connect(CardManager._on_beast_button_pressed)
 	
-	_win_count_label.text = str(CardManager._win_count)
+	_update_win_count_label()
 	
 	
 	await _create_deck()
@@ -199,8 +200,18 @@ func _disable_beast_buttons():
 	_kraken_button.button_pressed = false
 	_kraken_button.disabled = true
 
+func _update_win_count_label():
+	var text := str(CardManager._win_count)
+	_win_count_label.text = text
+	if text.length() > 4:
+		_win_count_label.add_theme_font_override("font", _overflow_font)
+		_win_count_label.add_theme_font_size_override("font_size", 6)
+	else:
+		_win_count_label.remove_theme_font_override("font")
+		_win_count_label.add_theme_font_size_override("font_size", 8)
+
 func _display_victory_screen():
-	_win_count_label.text = str(CardManager._win_count)
+	_update_win_count_label()
 	_victory_screen_instance = _victory_screen.instantiate()
 	add_child(_victory_screen_instance)
 	
