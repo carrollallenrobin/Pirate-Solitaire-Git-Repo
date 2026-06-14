@@ -446,19 +446,18 @@ func _discard_available_cards(discarded_cards : int = 0):
 		_finish_update_board_state()
 
 func _is_discardable(card: Card) -> bool:
-	
-#	if card._color == "Gold Sabre":
-#		return true
-		
 	if card._number == null:
 		return false
-	
-	if (card._number == 1 or card._number == 2) and _color_trails[card._color] == card._number -1:
-		return true
-		
-	if (_color_trails["Whl"] >= card._number -1 
-	and _color_trails["Shrk"] >= card._number -1 
-	and _color_trails["Seag"] >= card._number -1):
+
+	if _color_trails[card._color] != card._number - 1:
+		return false
+
+	# If all discarded stacks are not more than 2 smaller, it is always safe to discard
+	# as the discarded card would never be useful to keep another card on top of it.
+	# For example, 2 1 1 -> 3 1 1 is safe, as any remaining 2 can just be discarded
+	if (_color_trails["Whl"] >= card._number - 2
+	and _color_trails["Shrk"] >= card._number - 2
+	and _color_trails["Seag"] >= card._number - 2):
 		return true
 	
 	return false
